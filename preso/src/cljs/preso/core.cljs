@@ -9,11 +9,29 @@
 ;; Endpoints
 (def api-pricing-lambda "https://7w1dsa6ira.execute-api.us-east-1.amazonaws.com/staging/pricing/lambda")
 
+
+;; AWS.config.region = 'us-east-1'; // Region
+;; AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+;;     IdentityPoolId: 'us-east-1:13d149ac-036d-4108-a33e-ef4b6357ccfd',
+;; });
+
+(def AWS js/AWS)
+(def aws-region "us-east-1")
+(def aws-credentials (AWS.CognitoIdentityCredentials. 
+                       #js {:IdentityPoolId 
+                            "us-east-1:13d149ac-036d-4108-a33e-ef4b6357ccfd"}))
+
+(defn aws-config-cognito! []
+  (set! (.. AWS -config -region) aws-region)
+  (set! (.. AWS -credentials) aws-credentials))
+
 ;; -------------------------
 ;; Views
 
 (defn home-page []
   (println "home page!")
+  (println js/AWS)
+  (aws-config-cognito!)
   (GET api-pricing-lambda)
   [:div [:h2 "Welcome to preso"]
    [:div [:a {:href "/about"} "go to about page"]]])
