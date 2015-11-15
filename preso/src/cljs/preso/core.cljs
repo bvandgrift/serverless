@@ -3,38 +3,50 @@
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
+              ;; [preso.aws :as AWS]
               [ajax.core :refer [GET]]))
 
 ;; ------------------------
 ;; Endpoints
-(def api-pricing-lambda "https://7w1dsa6ira.execute-api.us-east-1.amazonaws.com/staging/pricing/lambda")
-
+(def api-pricing-lambda-url "https://7w1dsa6ira.execute-api.us-east-1.amazonaws.com/staging/pricing/lambda")
+(def api-pricing-ec2-url "/data/ec2.json")
 
 ;; AWS.config.region = 'us-east-1'; // Region
 ;; AWS.config.credentials = new AWS.CognitoIdentityCredentials({
 ;;     IdentityPoolId: 'us-east-1:13d149ac-036d-4108-a33e-ef4b6357ccfd',
 ;; });
 
-(def AWS js/AWS)
-(def aws-region "us-east-1")
-(def aws-credentials (AWS.CognitoIdentityCredentials. 
-                       #js {:IdentityPoolId 
-                            "us-east-1:13d149ac-036d-4108-a33e-ef4b6357ccfd"}))
-
-(defn aws-config-cognito! []
-  (set! (.. AWS -config -region) aws-region)
-  (set! (.. AWS -credentials) aws-credentials))
+;; state
+(def app-state (reagent/atom {:lambda {} :ec2 {}}))
 
 ;; -------------------------
 ;; Views
 
 (defn home-page []
   (println "home page!")
-  (println js/AWS)
-  (aws-config-cognito!)
-  (GET api-pricing-lambda)
-  [:div [:h2 "Welcome to preso"]
-   [:div [:a {:href "/about"} "go to about page"]]])
+  ;; (println AWS)
+  ;; (aws-config-cognito!)
+  [:div [:h2 "Serverless Microservices"]
+   [:ul 
+    [:li [:a {:href "/pricing"} "compare lambda & ec2 pricing &raquo;"]]
+    [:li [:a {:href "/about"} "about this presentation"]]]])
+
+(defn get-api-pricing-lambda []
+  (GET api-pricing-lambda-url :handler #(swap! (:lambda app-state) %)))
+
+(defn get-api-pricing-ec2 []
+  ;; (apply swap! app-state update-in [:contacts] f args))
+  (GET api-pricing-ec2-url :handler #(swap! app-state update-in [:ec2] replace %)))
+
+(defn pricing-page []
+  (get-api-pricing-lambda)
+  (get-api-pricing-ec2)
+  [:div 
+   [:h2 "Compare AWS pricing"]
+   [:h3 "lambda vs ec2"]
+   [:ul
+    (for [x (:ec2 @app-state)]
+      [:li [:pre (merge x {:key (get-in x "greeting")})]])]])
 
 (defn about-page []
   [:div [:h2 "About preso"]
@@ -49,6 +61,9 @@
 
 (secretary/defroute "/" []
   (session/put! :current-page #'home-page))
+
+(secretary/defroute "/pricing" []
+  (session/put! :current-page #'pricing-page)) 
 
 (secretary/defroute "/about" []
   (session/put! :current-page #'about-page)) 

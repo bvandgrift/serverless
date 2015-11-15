@@ -11,7 +11,9 @@
 (def loading-page (slurp "resources/public/index.html"))
 
 (defroutes routes
-  (GET "/" [] loading-page)
+  (GET "/"        [] loading-page)
+  (GET "/pricing" [] loading-page)
+  (GET "/about"   [] loading-page)
   (resources "/")
   (not-found "Not Found"))
 

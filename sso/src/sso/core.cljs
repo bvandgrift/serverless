@@ -1,5 +1,5 @@
 (ns sso.core
-  (:require [cljs-lambda.util :refer [async-lambda-fn]]
+  (:require [cljs-lambda.util :refer [async-lambda-fn wrap-lambda-fn]]
             [cljs.nodejs :as node])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
@@ -19,19 +19,19 @@
 (def dynamo-db (AWS.DynamoDB.))
 (def dynamo-table-name "serverless-sso")
 
-(defn get-user [email]
+(defn get-user [email success-fn failure-fn]
   (let [params {:Key {:email {:S email}}
                 :TableName dynamo-table-name}]
     (.getItem dynamo-db (clj->js params) 
-              #(if %1 (println "error" %1) (println "record" %2)))))
+              #(if %1 failure-fn success-fn))))
+
+(defn clj-create-user [{:keys [user]} context]
+  (get-user (:email user) #(println "error" %) #(println "record" %))
+  (println "Not much to do yet for creating users")
+  user)
 
 (def ^:export create-user
-  (async-lambda-fn
-   (fn [{:keys [user]} context]
-     (go
-       (get-user (:email user))
-       (println "Not much to do yet for creating users")
-       user))))
+  (wrap-lambda-fn clj-create-user))
 
 (def ^:export create-session
   (async-lambda-fn
@@ -42,6 +42,6 @@
 (defn -main [& args]
   (println "running"
            (create-user #js {:user {:email "adam@aerost.at"}}
-                        #js {:succeed #(println %)})))
+                        #js {:succeed #(println "success" %)})))
 
 (set! *main-cli-fn* -main)
