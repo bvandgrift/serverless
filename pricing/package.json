@@ -1,0 +1,17 @@
+{
+  "name": "pricing",
+  "version": "1.0.0",
+  "description": "fetch ec2 and lambda pricing on aws lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Hunter, Ben Vandgrift",
+  "repository": "https://github.com/aerostat/serverless",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "request": "^2.65.0",
+    "source-map-support": "^0.3.3"
+  }
+}

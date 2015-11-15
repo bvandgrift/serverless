@@ -1,0 +1,4 @@
+# new build system or something...
+api/vendor/aws-apigateway-importer/target
+
+vendor/

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+case "$1" in
+  cljs)
+    rm -rf out/
+    java -cp $ROOT_DIR/../vendor/cljs.jar:src clojure.main build.clj
+    ;;
+  zip)
+    $0 cljs
+    zip -r target/pricing.zip index.js main.js out node_modules
+    ;;
+  *)
+    echo "usage $0 <cljs|zip>"
+esac
+

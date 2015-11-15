@@ -1,0 +1,3 @@
+[submodule "api/vendor/aws-apigateway-importer"]
+	path = api/vendor/aws-apigateway-importer
+	url = git@github.com:awslabs/aws-apigateway-importer.git

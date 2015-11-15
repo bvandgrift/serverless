@@ -1,0 +1,55 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: 'Serverless'
+schemes:
+  - https
+host: 'serverless.aerost.at'
+basePath: /
+produces:
+  - application/json
+paths:
+  /pricing/lambda:
+    get:
+      summary: Gets current AWS lambda pricing
+      description: |
+        Fetches the AWS lambda pricing from the table
+        published on https://aws.amazon.com/lambda/pricing/
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
+          schema:
+            $ref: '#/definitions/lambdaPricing'
+      tags:
+        - Login
+      x-amazon-apigateway-integration:
+        type: aws
+        uri: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:472521722016:function:pricing/invocations'
+        credentials: 'arn:aws:iam::472521722016:role/preso-api-gateway'
+        httpMethod: POST
+        responses:
+          "default":
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin : "'*'"
+
+definitions:
+  lambdaPricing:
+    title: List of lambda prices by memory allocation
+    type: array
+    items:
+      type: object
+      properties:
+        memory:
+          type: string
+        free:
+          type: integer
+        price:
+          type: number

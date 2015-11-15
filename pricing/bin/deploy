@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+VERSION=$(cat "$ROOT_DIR/VERSION")
+
+build-zip () {
+  $ROOT_DIR/bin/build zip
+  ZIP_FILE="fileb://$ROOT_DIR/target/pricing.zip"
+}
+
+case "$1" in
+  create)
+    build-zip
+
+    aws --profile aerostat lambda create-function \
+      --region us-east-1 \
+      --function-name pricing \
+      --zip-file $ZIP_FILE \
+      --role arn:aws:iam::472521722016:role/lambda_basic_execution \
+      --handler index.handler \
+      --description "lambda and ec2 pricing" \
+      --runtime nodejs \
+      --timeout 12 \
+      --memory-size 1024
+    ;;
+  update)
+    build-zip
+
+    aws --profile aerostat lambda update-function-code \
+      --function-name pricing \
+      --zip-file $ZIP_FILE
+    ;;
+  *)
+    echo "usage $0 <create|update>"
+esac
+

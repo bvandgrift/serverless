@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+aws s3 cp --recursive $ROOT_DIR/target/cljsbuild/public/ s3://aerostat-serverless/ \
+  --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
+
+aws s3 cp --recursive $ROOT_DIR/resources/public/ s3://aerostat-serverless/ \
+  --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
