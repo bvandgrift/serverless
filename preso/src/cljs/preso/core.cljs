@@ -32,21 +32,34 @@
     [:li [:a {:href "/about"} "about this presentation"]]]])
 
 (defn get-api-pricing-lambda []
-  (GET api-pricing-lambda-url :handler #(swap! (:lambda app-state) %)))
+  (GET api-pricing-lambda-url :handler #(swap! app-state assoc :lambda %)))
 
 (defn get-api-pricing-ec2 []
-  ;; (apply swap! app-state update-in [:contacts] f args))
-  (GET api-pricing-ec2-url :handler #(swap! app-state update-in [:ec2] replace %)))
+  (GET api-pricing-ec2-url :handler #(swap! app-state assoc :ec2 %)))
 
-(defn pricing-page []
-  (get-api-pricing-lambda)
-  (get-api-pricing-ec2)
+(defn pricing-lambda []
+  [:ul
+   (for [x (:lambda @app-state)]
+     [:li {:key (get x "Memory (MB)")}
+      [:pre (JSON.stringify x)]])])
+
+(defn pricing-ec2 []
+  [:ul
+   (for [x (:ec2 @app-state)]
+     [:li {:key (get x "greeting")}
+      [:pre (JSON.stringify x)]])])
+
+(defn pricing []
   [:div 
    [:h2 "Compare AWS pricing"]
    [:h3 "lambda vs ec2"]
-   [:ul
-    (for [x (:ec2 @app-state)]
-      [:li [:pre (merge x {:key (get-in x "greeting")})]])]])
+   (pricing-lambda)
+   (pricing-ec2)])
+  
+(defn pricing-page []
+  (get-api-pricing-lambda)
+  (get-api-pricing-ec2)
+  pricing)
 
 (defn about-page []
   [:div [:h2 "About preso"]

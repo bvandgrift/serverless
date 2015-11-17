@@ -9,6 +9,36 @@ basePath: /
 produces:
   - application/json
 paths:
+  /pricing/ec2:
+    get:
+      summary: Proxies to AWS Static EC2 Pricing
+      description: |
+        Proxies to the AWS Static EC2 Pricing page as
+        it does not have CORS headers.
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
+          schema:
+            # $ref: '#/definitions/some-def'
+      tags:
+        - pricing
+      x-amazon-apigateway-integration:
+        type: http
+        uri: 'https://a0.awsstatic.com/pricing/1/ec2/ri-v2/linux-unix-shared.min.js'
+        httpMethod: GET
+        responses:
+          "default":
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin : "'*'"
+
   /pricing/lambda:
     get:
       summary: Gets current AWS lambda pricing
@@ -32,6 +62,68 @@ paths:
       x-amazon-apigateway-integration:
         type: aws
         uri: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:472521722016:function:pricing/invocations'
+        credentials: 'arn:aws:iam::472521722016:role/preso-api-gateway'
+        httpMethod: POST
+        responses:
+          "default":
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin : "'*'"
+
+  /user:
+    post:
+      summary: Creates a new user via a lambda fn
+      description: |
+        Create a new user in dynamo db with hashed password
+        and attached cognito id.
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
+          schema:
+            # $ref: '#/definitions/lambdaPricing'
+      tags:
+        - Login
+      x-amazon-apigateway-integration:
+        type: aws
+        uri: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:472521722016:function:create-user/invocations'
+        credentials: 'arn:aws:iam::472521722016:role/preso-api-gateway'
+        httpMethod: POST
+        responses:
+          "default":
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin : "'*'"
+
+  /session:
+    post:
+      summary: Creates a new user session via a lambda fn
+      description: |
+        Authenitcate the user against the dynamo db record
+        and retrieve an open id token from cognito.
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
+          schema:
+            # $ref: '#/definitions/lambdaPricing'
+      tags:
+        - Login
+      x-amazon-apigateway-integration:
+        type: aws
+        uri: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:472521722016:function:create-session/invocations'
         credentials: 'arn:aws:iam::472521722016:role/preso-api-gateway'
         httpMethod: POST
         responses:

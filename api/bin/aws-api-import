@@ -2,4 +2,4 @@
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
-java -jar $ROOT_DIR/vendor/aws-apigateway-importer/target/aws-apigateway-importer-1.0.2-SNAPSHOT-jar-with-dependencies.jar "$@"
+java -jar $ROOT_DIR/vendor/aws-apigateway-importer/target/aws-apigateway-importer-1.0.1-jar-with-dependencies.jar "$@"

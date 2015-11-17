@@ -9,15 +9,14 @@
             [lein-npm "0.5.0"]
             [io.nervous/lein-cljs-lambda "0.2.4"]]
   :node-dependencies [[source-map-support "0.2.8"]
-                      [aws-sdk "2.2.17"]]
+                      [aws-sdk "2.2.17"]
+                      [bcrypt-nodejs "0.0.3"]]
   :source-paths ["src"]
   :cljs-lambda
   {:defaults {:role "arn:aws:iam::472521722016:role/serverless-sso"}
    :aws-profile "aerostat"
    :functions
-   [{:name   "work-magic"
-     :invoke sso.core/work-magic}
-    {:name   "create-user"
+   [{:name   "create-user"
      :invoke sso.core/create-user
      :description "create a user in dynamo for cognito"
      :memory-size 1024}
