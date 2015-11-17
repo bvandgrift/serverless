@@ -14,6 +14,8 @@
   (GET "/"        [] loading-page)
   (GET "/pricing" [] loading-page)
   (GET "/about"   [] loading-page)
+  (GET "/sign-in" [] loading-page)
+  (GET "/sign-up" [] loading-page)
   (resources "/")
   (not-found "Not Found"))
 
